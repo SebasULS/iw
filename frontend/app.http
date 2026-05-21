@@ -1,0 +1,213 @@
+### SGCP - Sistema de Gestión de Citas para Peluquería
+### Pruebas de la API REST con JWT
+### Base URL: http://127.0.0.1:8000
+
+@baseUrl = http://127.0.0.1:8000
+@contentType = application/json
+
+# ─────────────────────────────────────────────
+# 1. AUTENTICACIÓN JWT
+# ─────────────────────────────────────────────
+
+### Obtener token de acceso (POST /api/token/)
+POST {{baseUrl}}/api/token/
+Content-Type: {{contentType}}
+
+{
+  "username": "admin",
+  "password": "admin1234"
+}
+
+### Refrescar token (POST /api/token/refresh/)
+POST {{baseUrl}}/api/token/refresh/
+Content-Type: {{contentType}}
+
+{
+  "refresh": "<REFRESH_TOKEN_AQUI>"
+}
+
+# ─────────────────────────────────────────────
+# 2. PELUQUERÍAS  /api/peluquerias/
+# ─────────────────────────────────────────────
+
+### Listar peluquerías
+GET {{baseUrl}}/api/peluquerias/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear peluquería
+POST {{baseUrl}}/api/peluquerias/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "nombre": "Bella Estética",
+  "direccion": "Av. Principal 123",
+  "telefono": "987654321",
+  "descripcion": "Centro de belleza profesional",
+  "status": "active"
+}
+
+### Obtener peluquería por id
+GET {{baseUrl}}/api/peluquerias/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Actualizar peluquería
+PUT {{baseUrl}}/api/peluquerias/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "nombre": "Bella Estética Premium",
+  "direccion": "Av. Principal 123",
+  "telefono": "987654321",
+  "descripcion": "Centro de belleza profesional actualizado",
+  "status": "active"
+}
+
+### Eliminar peluquería
+DELETE {{baseUrl}}/api/peluquerias/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+# ─────────────────────────────────────────────
+# 3. USUARIOS  /api/usuarios/
+# ─────────────────────────────────────────────
+
+### Listar usuarios
+GET {{baseUrl}}/api/usuarios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear usuario
+POST {{baseUrl}}/api/usuarios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "nombre": "Carlos Perez",
+  "email": "carlos@correo.com",
+  "contraseña": "segura1234",
+  "telefono": "912345678",
+  "rol": "cliente",
+  "status": "active"
+}
+
+### Obtener usuario por id
+GET {{baseUrl}}/api/usuarios/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Eliminar usuario
+DELETE {{baseUrl}}/api/usuarios/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+# ─────────────────────────────────────────────
+# 4. ESTILISTAS  /api/estilistas/
+# ─────────────────────────────────────────────
+
+### Listar estilistas
+GET {{baseUrl}}/api/estilistas/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear estilista
+POST {{baseUrl}}/api/estilistas/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "nombre": "Maria Lopez",
+  "telefono": "987111222",
+  "especialidad": "Corte y Color",
+  "hair_salon": 1,
+  "status": "active"
+}
+
+# ─────────────────────────────────────────────
+# 5. SERVICIOS  /api/servicios/
+# ─────────────────────────────────────────────
+
+### Listar servicios
+GET {{baseUrl}}/api/servicios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear servicio
+POST {{baseUrl}}/api/servicios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "nombre": "Corte de cabello",
+  "descripcion": "Corte clásico con lavado",
+  "precio": "35.00",
+  "duracion_minutos": 45,
+  "hair_salon": 1,
+  "status": "active"
+}
+
+# ─────────────────────────────────────────────
+# 6. CITAS  /api/citas/
+# ─────────────────────────────────────────────
+
+### Listar citas
+GET {{baseUrl}}/api/citas/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear cita
+POST {{baseUrl}}/api/citas/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "user": 1,
+  "stylist": 1,
+  "service": 1,
+  "fecha": "2026-06-01",
+  "hora_inicio": "10:00:00",
+  "hora_fin": "10:45:00",
+  "estado": "pendiente",
+  "observaciones": "",
+  "status": "active"
+}
+
+### Obtener cita por id
+GET {{baseUrl}}/api/citas/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Actualizar estado de cita
+PATCH {{baseUrl}}/api/citas/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "estado": "confirmada"
+}
+
+### Eliminar cita
+DELETE {{baseUrl}}/api/citas/1/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+# ─────────────────────────────────────────────
+# 7. HORARIOS ESTILISTA  /api/horarios/
+# ─────────────────────────────────────────────
+
+### Listar horarios
+GET {{baseUrl}}/api/horarios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+
+### Crear horario de estilista
+POST {{baseUrl}}/api/horarios/
+Authorization: Bearer <ACCESS_TOKEN_AQUI>
+Content-Type: {{contentType}}
+
+{
+  "stylist": 1,
+  "dia_semana": "lunes",
+  "hora_inicio": "09:00:00",
+  "hora_fin": "17:00:00",
+  "activo": true,
+  "status": "active"
+}
+
+# ─────────────────────────────────────────────
+# 8. VALIDACIÓN DE SEGURIDAD (sin token → 401)
+# ─────────────────────────────────────────────
+
+### Acceso sin token (debe retornar 401)
+GET {{baseUrl}}/api/peluquerias/

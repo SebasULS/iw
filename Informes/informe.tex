@@ -1,0 +1,510 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+
+\geometry{margin=2.5cm}
+
+% Estilo para bloques de código
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeblue}{rgb}{0.0,0.3,0.6}
+\lstset{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codeblue}\bfseries,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    captionpos=b,
+    showstringspaces=false,
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+
+% ─────────────────────────────────────────────
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\large Universidad La Salle\\}
+    {\large Facultad de Ingenierías y Arquitectura\\}
+    {\large Departamento Académico de Ingeniería y Matemáticas\\}
+    {\large Carrera Profesional de Ingeniería de Software\\[0.5cm]}
+    {\large \textbf{Ingeniería Web}\\[2cm]}
+
+    {\Huge \textbf{SGCP}\\[0.3cm]}
+    {\Large Sistema de Gestión de Citas para Peluquería\\[2cm]}
+
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Autor} & \textbf{Rol} \\
+        \midrule
+        Davis Arapa Chua     & Configuración del proyecto Django y estructura base \\
+        Sebastian Castro Mamani & Restricciones del modelo y pruebas funcionales \\
+        Piero Delgado Chipana   & Administración de modelos en Django Admin \\
+        Hugo Diaz Chavez        & Documentación y evidencias \\
+        \bottomrule
+    \end{tabular}
+
+    \vfill
+    {\large \today}
+\end{titlepage}
+
+% ─────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────
+\section{Descripción del Proyecto}
+
+El presente sistema web, denominado \textbf{SGCP} (Sistema de Gestión de Citas para Peluquería),
+tiene el objetivo de automatizar la generación y gestión de citas en establecimientos de peluquería.
+El sistema permite:
+
+\begin{itemize}
+    \item Registrar peluquerías, usuarios (clientes, recepcionistas y administradores),
+          estilistas y servicios.
+    \item Gestionar la disponibilidad horaria de cada estilista por día de la semana.
+    \item Reservar citas verificando la ausencia de cruces de horario.
+    \item Exponer una API REST completa protegida con autenticación JWT.
+    \item Administrar todos los recursos desde el panel de Django Admin.
+\end{itemize}
+
+% ─────────────────────────────────────────────
+\section{Equipos, Materiales y Tecnologías Utilizadas}
+
+\begin{tabular}{lll}
+    \toprule
+    \textbf{Herramienta} & \textbf{Versión} & \textbf{Uso} \\
+    \midrule
+    Windows / Linux & --- & Sistema operativo de desarrollo \\
+    Visual Studio Code & 1.9x & Editor principal y cliente REST \\
+    Python & 3.11+ & Lenguaje principal \\
+    Django & 6.0.4 & Framework web backend \\
+    Django REST Framework & 3.17.1 & Construcción de la API RESTful \\
+    SimpleJWT & 5.5.1 & Autenticación con tokens JWT \\
+    django-cors-headers & 4.7+ & Habilitación de CORS para el frontend \\
+    HTML / CSS / JS & --- & Frontend estático (consumo directo de la API) \\
+    SQLite & --- & Base de datos local (desarrollo) \\
+    PostgreSQL & 12+ & Base de datos de producción \\
+    Git & --- & Control de versiones \\
+    GitHub & --- & Repositorio remoto colaborativo \\
+    django-extensions & 4.1 & Generación del diagrama E-R \\
+    \bottomrule
+\end{tabular}
+
+% ─────────────────────────────────────────────
+\section{URL del Repositorio GitHub}
+
+Repositorio GitHub:\\
+\url{https://github.com/Vsrn12/SGCP.git}
+
+% ─────────────────────────────────────────────
+\section{Estructura del Proyecto}
+
+\begin{lstlisting}[language=bash, caption=Estructura de directorios]
+SGCP/
+|--- README.md
+|--- requirements.txt
+|
+|--- Back/
+|   |--- db/
+|   |   |--- SGCPelu.sql          # Backup completo PostgreSQL
+|   |   |--- peluqueria_db.sql    # Script de tablas
+|   |   |--- datos_prueba.sql     # Datos de prueba
+|   |
+|   |--- MyDjangoProyect/
+|       |--- manage.py
+|       |--- db.sqlite3
+|       |--- crear_datos.py
+|       |--- MyDjangoProyect/
+|       |   |--- settings.py      # +corsheaders, +rest_framework, +simplejwt
+|       |   |--- urls.py          # Router API + /api/token/
+|       |   |--- wsgi.py
+|       |   |--- asgi.py
+|       |
+|       |--- MyWebApps/
+|           |--- SAC/
+|               |--- admin.py
+|               |--- serializers.py
+|               |--- views.py
+|               |--- migrations/
+|               |--- models/
+|                   |--- base.py
+|                   |--- peluqueria.py
+|                   |--- usuario.py
+|                   |--- estilista.py
+|                   |--- servicio.py
+|                   |--- cita.py
+|                   |--- horario_estilista.py
+|
+|--- Front/
+|   |--- index.html       # Pantalla de login
+|   |--- dashboard.html   # Dashboard principal (6 tabs CRUD)
+|   |--- app.http         # Pruebas REST (VS Code REST Client)
+|   |--- css/
+|   |   |--- style.css    # Estilos: login, navbar, tablas, modales
+|   |--- js/
+|       |--- auth.js      # Login/logout, refresco de token JWT
+|       |--- api.js       # fetch wrapper con Bearer token automatico
+|       |--- app.js       # Logica del dashboard
+|
+|--- Informes/
+    |--- informe.tex  # Este documento
+\end{lstlisting}
+
+% ─────────────────────────────────────────────
+\section{Preparación del Entorno para Django y JWT}
+
+\subsection{Marco Teórico}
+
+\textbf{Django} es un framework web de alto nivel basado en Python que promueve el desarrollo rápido,
+limpio y pragmático. Utiliza el patrón Modelo-Plantilla-Vista (MTV).
+
+Para este proyecto se complementa con:
+\begin{itemize}
+    \item \textbf{Django REST Framework:} Extiende Django para construir APIs RESTful robustas con
+          serialización, validación y autenticación integradas.
+    \item \textbf{SimpleJWT:} Implementa autenticación basada en tokens JWT (JSON Web Tokens),
+          permitiendo autorización sin estado y mejorando la seguridad de la API.
+    \item \textbf{SQLite:} Sistema de base de datos compacto ideal para desarrollo, fácilmente
+          reemplazable por PostgreSQL en producción.
+\end{itemize}
+
+\subsection{Configuración del Entorno Virtual}
+
+\begin{lstlisting}[language=bash, caption=Configuración del entorno virtual]
+$ cd SGCP
+$ python -m venv venv
+$ source venv/bin/activate       # Linux/macOS
+$ venv\Scripts\Activate.ps1      # Windows PowerShell
+\end{lstlisting}
+
+\subsection{Instalación de Dependencias}
+
+\begin{lstlisting}[language=bash, caption=Instalación de dependencias]
+(venv) $ pip install Django==6.0.4
+(venv) $ pip install djangorestframework
+(venv) $ pip install djangorestframework-simplejwt
+(venv) $ pip install django-cors-headers
+(venv) $ pip install django-extensions
+(venv) $ pip install pydotplus
+(venv) $ pip install sqlparse==0.5.5
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, caption=Generación de requirements.txt]
+(venv) $ pip freeze > requirements.txt
+\end{lstlisting}
+
+\subsection{Generación de Migraciones y Superusuario}
+
+\begin{lstlisting}[language=bash, caption=Generando y aplicando migraciones]
+(venv) $ cd Back/MyDjangoProyect
+(venv) $ python manage.py makemigrations
+(venv) $ python manage.py migrate
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, caption=Creación del superusuario]
+% El superusuario ya esta incluido en db.sqlite3 del repositorio.
+% Credenciales de acceso:
+%   Usuario:    admin
+%   Contrasena: 123
+% Si se necesita recrear:
+(venv) $ python manage.py createsuperuser
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Campo} & \textbf{Valor} \\
+\hline
+Usuario & \texttt{admin} \\
+Contrase\~na & \texttt{123} \\
+\hline
+\end{tabular}
+\caption{Credenciales del superusuario (entorno de desarrollo)}
+\end{table}
+
+\begin{lstlisting}[language=bash, caption=Generando diagrama E-R]
+(venv) $ python manage.py graph_models SAC -o sac.dot
+(venv) $ dot -Tpng sac.dot -o sac.png
+\end{lstlisting}
+
+% ─────────────────────────────────────────────
+\section{Modelo de Datos: Diagrama E-R}
+
+% [INSERTAR IMAGEN DEL DIAGRAMA E-R AQUI]
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{sac.png}
+%     \caption{Diagrama Entidad-Relación del Sistema SGCP}
+% \end{figure}
+
+\subsection{Entidades del Sistema}
+
+\textbf{Peluqueria} (\texttt{hair\_salons}): Representa la sede principal del negocio.
+Contiene nombre, dirección, teléfono y descripción.
+
+\textbf{Usuario} (\texttt{users}): Almacena a los clientes, recepcionistas y administradores.
+La contraseña se almacena cifrada mediante \texttt{make\_password}.
+Los roles válidos son: \texttt{cliente}, \texttt{administrador}, \texttt{recepcionista}.
+
+\textbf{Estilista} (\texttt{stylists}): Modela al personal que atiende los servicios.
+Incluye nombre, teléfono, especialidad y la peluquería a la que pertenece.
+
+\textbf{Servicio} (\texttt{services}): Define la oferta comercial.
+Contiene nombre, descripción, precio y duración en minutos.
+
+\textbf{Cita} (\texttt{appointments}): Gestiona las reservas.
+Asocia usuario, estilista y servicio en una fecha y horario específicos.
+El estado puede ser: \texttt{pendiente}, \texttt{confirmada}, \texttt{completada}, \texttt{cancelada}.
+
+\textbf{HorarioEstilista} (\texttt{stylist\_schedules}): Describe la disponibilidad semanal
+de cada estilista con día, hora de inicio y hora de fin.
+
+Todos los modelos heredan de \textbf{ModeloAuditable}, que centraliza los campos de auditoría:
+\texttt{status}, \texttt{created}, \texttt{modified}, \texttt{created\_id}, \texttt{modified\_id}.
+
+% ─────────────────────────────────────────────
+\section{Inicialización del Servidor}
+
+\begin{lstlisting}[language=bash, caption=Clonando e iniciando el servidor]
+$ git clone https://github.com/Vsrn12/SGCP.git
+$ cd SGCP
+$ cd Back/MyDjangoProyect
+$ python -m venv venv
+$ source venv/bin/activate       # Linux/macOS
+$ venv\Scripts\Activate.ps1      # Windows
+(venv) $ pip install -r ../../requirements.txt
+(venv) $ python manage.py migrate
+(venv) $ python manage.py runserver
+\end{lstlisting}
+
+\subsection{Credenciales del Superusuario}
+
+La base de datos \texttt{db.sqlite3} incluida en el repositorio ya contiene
+el superusuario de desarrollo:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Campo} & \textbf{Valor} \\
+\hline
+Usuario & \texttt{admin} \\
+Contrase\~na & \texttt{123} \\
+\hline
+\end{tabular}
+\caption{Credenciales del superusuario (entorno de desarrollo)}
+\end{table}
+
+\subsection{Creación de un Superusuario}
+
+\begin{lstlisting}[language=bash, caption=Creando un superusuario]
+(venv) $ python manage.py createsuperuser
+Nombre de usuario: admin
+Password: ****
+Superuser created successfully.
+\end{lstlisting}
+
+% ─────────────────────────────────────────────
+\section{Pruebas de la API REST con JWT}
+
+Para validar el correcto funcionamiento del sistema, se empleó el cliente
+\textbf{VS Code REST Client} (\texttt{Front/app.http}) para realizar pruebas sobre los endpoints.
+
+\subsection{Autenticación con JWT}
+
+Se envía una petición \texttt{POST /api/token/} con credenciales del superusuario:
+
+\begin{lstlisting}[caption=Obtener token JWT — Solicitud]
+POST http://127.0.0.1:8000/api/token/
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "admin1234"
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Obtener token JWT — Respuesta]
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "access":  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+\end{lstlisting}
+
+\subsection{Operaciones CRUD sobre Peluquerías}
+
+\textbf{Listar peluquerías} — Con el header \texttt{Authorization: Bearer <token>},
+la petición \texttt{GET /api/peluquerias/} devuelve la lista en JSON (HTTP 200).
+
+\begin{lstlisting}[caption=Listar peluquerías — Solicitud]
+GET http://127.0.0.1:8000/api/peluquerias/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+\end{lstlisting}
+
+\textbf{Crear peluquería} — \texttt{POST /api/peluquerias/} con cuerpo JSON genera un nuevo
+registro (HTTP 201).
+
+\begin{lstlisting}[caption=Crear peluquería — Solicitud]
+POST http://127.0.0.1:8000/api/peluquerias/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+    "nombre": "Bella Estetica",
+    "direccion": "Av. Principal 123",
+    "telefono": "987654321",
+    "descripcion": "Centro de belleza profesional",
+    "status": "active"
+}
+\end{lstlisting}
+
+\subsection{Validación de Seguridad}
+
+Se verificó que la API rechaza peticiones sin autenticación:
+
+\begin{lstlisting}[caption=Acceso sin token — Solicitud]
+GET http://127.0.0.1:8000/api/peluquerias/
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Acceso sin token — Respuesta (HTTP 401)]
+{
+    "detail": "Authentication credentials were not provided."
+}
+\end{lstlisting}
+
+% ─────────────────────────────────────────────
+\section{Frontend: Interfaz Web Estática}
+
+El directorio \texttt{Front/} contiene una interfaz web estática desarrollada en
+HTML, CSS y JavaScript puro que consume la API REST directamente desde el navegador.
+
+\subsection{Arquitectura del Frontend}
+
+\begin{itemize}
+    \item \textbf{auth.js}: Gestiona el ciclo de vida del token JWT.  Realiza el \texttt{POST /api/token/},
+          almacena \texttt{access} y \texttt{refresh} en \texttt{localStorage}, y refresca el token
+          automáticamente cuando expira (\texttt{POST /api/token/refresh/}).
+    \item \textbf{api.js}: Wrapper sobre \texttt{fetch} que adjunta el header
+          \texttt{Authorization: Bearer <token>} en cada petición y reintenta con el nuevo token
+          si recibe HTTP 401.
+    \item \textbf{app.js}: Lógica del dashboard.  Gestiona la navegación por tabs,
+          renderiza tablas dinámicas y abre modales de creación y edición para las seis
+          entidades del sistema.
+\end{itemize}
+
+\subsection{Habilitación de CORS}
+
+Para que el navegador pueda realizar peticiones al servidor Django desde un origen distinto
+(archivo local o servidor estático), se configuró \texttt{django-cors-headers} en
+\texttt{settings.py}:
+
+\begin{lstlisting}[language=Python, caption=Configuración CORS en settings.py]
+INSTALLED_APPS = [
+    ...
+    'corsheaders',
+    ...
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # debe ir primero
+    'django.middleware.security.SecurityMiddleware',
+    ...
+]
+
+# Desarrollo: permite cualquier origen
+CORS_ALLOW_ALL_ORIGINS = True
+\end{lstlisting}
+
+\subsection{Uso del Frontend}
+
+\begin{enumerate}
+    \item Iniciar el servidor Django (\texttt{python manage.py runserver}).
+    \item Abrir \texttt{Front/index.html} en el navegador (Live Server o doble clic).
+    \item Iniciar sesión con las credenciales del superusuario.
+    \item Navegar por los tabs: Peluquerías, Estilistas, Servicios, Usuarios, Citas, Horarios.
+\end{enumerate}
+
+% ─────────────────────────────────────────────
+\section{Base de Datos PostgreSQL}
+
+El directorio \texttt{Back/db/} contiene los archivos SQL para el entorno de producción:
+
+\begin{itemize}
+    \item \textbf{SGCPelu.sql}: Backup completo con estructura y datos de prueba.
+    \item \textbf{peluqueria\_db.sql}: Script de creación de tablas.
+    \item \textbf{datos\_prueba.sql}: Datos de prueba adicionales.
+\end{itemize}
+
+\begin{lstlisting}[language=bash, caption=Importar backup PostgreSQL]
+psql -U postgres -h localhost -c "CREATE DATABASE sgcpelu;"
+psql -U postgres -h localhost -d sgcpelu -f Back/db/SGCPelu.sql
+psql -U postgres -h localhost -d sgcpelu -c "\dt"
+\end{lstlisting}
+
+% ─────────────────────────────────────────────
+\section{Conclusiones}
+
+\begin{itemize}
+    \item La autenticación mediante JWT se implementó correctamente, permitiendo un acceso
+          seguro y controlado a los recursos de la API REST.
+    \item Todas las operaciones CRUD fueron implementadas, probadas con el cliente REST
+          de VS Code (\texttt{app.http}) y accesibles desde el frontend web.
+    \item Se desarrolló una interfaz web estática (HTML/CSS/JS) que consume la API REST
+          con autenticación JWT, sin necesidad de frameworks adicionales de frontend.
+    \item El sistema rechaza correctamente las solicitudes no autenticadas, validando la
+          seguridad de los endpoints.
+    \item Los modelos incluyen validaciones de negocio robustas: control de cruces de horario,
+          encriptación de contraseñas y consistencia de relaciones entre entidades.
+    \item La arquitectura modular con modelos separados y herencia de \texttt{ModeloAuditable}
+          facilita el mantenimiento y extensión del sistema.
+\end{itemize}
+
+% ─────────────────────────────────────────────
+\section{Rúbrica}
+
+\begin{longtable}{p{5cm}rp{6cm}}
+    \toprule
+    \textbf{Ítem} & \textbf{Puntos} & \textbf{Descripción} \\
+    \midrule
+    \endhead
+    1. GitHub & 2 & Repositorio con todos los archivos. Se clona. \\
+    2. Base de datos & 4 & Django Admin + SQLite/PostgreSQL configurados \\
+    3. REST Framework & 4 & Endpoints serializados JSON. CRUD completo \\
+    4. JWT & 4 & Autenticación con SimpleJWT \\
+    5. REST Client & 3 & Pruebas con VS Code REST Client (\texttt{app.http}) \\
+    6. Deploy & 3 & Despliegue en la nube (pendiente) \\
+    \midrule
+    \textbf{Total} & \textbf{20} & \\
+    \bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────
+\section{Entregables}
+
+\begin{itemize}
+    \item Informe en formato \LaTeX{} (\texttt{Informes/informe.tex}).
+    \item Repositorio GitHub clonable con README.md y todos los archivos del proyecto:\\
+          \url{https://github.com/Vsrn12/SGCP.git}
+    \item Proyecto listo para despliegue (pendiente configurar en la nube).
+    \item Video de demostración y prueba de funcionalidad: \textit{[pendiente de enlace]}.
+\end{itemize}
+
+\end{document}
